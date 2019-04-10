@@ -9,13 +9,25 @@ class BusinessDay extends Jenssenger
 {
     use Catholic;
 
-    private static $configFormat = "d-m";
+    const CONF_FORMAT = "d-m";
 
+    const SATURDAY = 6;
 
-    public function isBusinessDay()
+    public function isBusinessDay(): bool
     {
-        return $this->dayOfWeek === config('business-day.restDay') | (config('business-day.saturdayIsBusinessDay') && $this->dayOfWeek == 6) | $this->isHoliday() ? false : true;
+        return !$this->isRestDay() && !$this->isHoliday() && $this->isSaturdayBusinessDay();
     }
+
+    public function isRestDay(): bool
+    {
+        return $this->dayOfWeek === config('business-day.restDay');
+    }
+
+    public function isSaturdayBusinessDay(): bool
+    {
+        return config('business-day.saturdayIsBusinessDay') && $this->dayOfWeek == self::SATURDAY;
+    }
+
 
     public function nextBusinessDay()
     {
@@ -41,11 +53,11 @@ class BusinessDay extends Jenssenger
     {
         foreach (config('business-day.holidays') as $date) {
             if (is_array($date)) {
-                if ($this->inHolidayPeriod($date)) {
+                if ($this->onHolidayPeriod($date)) {
                     return true;
                 }
             } else {
-                if ($date."-".$this->year == $this->format("d-m-Y")) {
+                if ($this->onHoliday($date)) {
                     return true;
                 }
             }
@@ -53,15 +65,21 @@ class BusinessDay extends Jenssenger
         return false;
     }
 
-    private function inHolidayPeriod($dates)
+    private function onHoliday($date): bool
     {
-        $start = new static($dates[0]."-".$this->year);
-        $finish = new static($dates[1]."-".$this->year);
-        return $this->between($start->subDay(), $finish->addDay());
+        return $date."-".$this->year == $this->format("d-m-Y");
+    }
+
+    private function onHolidayPeriod($dates): bool
+    {
+        return $this->between(
+            (new static($dates[0]."-".$this->year))->subDay(),
+            (new static($dates[1]."-".$this->year))->addDay()
+        );
     }
 
     public function config()
     {
-        return  $this->format(self::$configFormat);
+        return  $this->format(self::CONF_FORMAT);
     }
 }
