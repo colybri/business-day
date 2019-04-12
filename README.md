@@ -13,8 +13,23 @@ composer require colybri/business-day
 
 Laravel 5
 -------
-In Laravel 5.5 or higher, this package will be automatically discovered and you can safely skip the following two steps.
-For Laravel 5.4 or lower there is a service provider included for integration with the Laravel framework. Add the following to the providers array in `config/app.php`:
+For Laravel 5.5 or lower you must use version 1 of this library.
+ 
+### Laravel version Compatibility
+
+ Laravel  | Package
+:---------|:----------
+ 5.0.x    | 1.0.x
+ 5.1.x    | 1.0.x
+ 5.2.x    | 1.0.x
+ 5.3.x    | 1.0.x
+ 5.4.x    | 1.0.x
+ 5.5.x    | 1.0.x
+ 5.6.x    | 1.0.x
+ 5.7.x    | 2.0.x
+ 
+In Laravel 5.6 or higher, this package will be automatically discovered and you can safely skip the following two steps.
+Add the following to the providers array in `config/app.php`:
 
 ```php
 Colybri\BusinessDay\BusinessDayServiceProvider::class,
