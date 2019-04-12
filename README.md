@@ -25,7 +25,7 @@ For Laravel 5.5 or lower you must use version 1 of this library.
  5.3.x    | 1.0.x
  5.4.x    | 1.0.x
  5.5.x    | 1.0.x
- 5.6.x    | 1.0.x
+ 5.6.x    | 2.0.x
  5.7.x    | 2.0.x
  
 In Laravel 5.6 or higher, this package will be automatically discovered and you can safely skip the following two steps.
