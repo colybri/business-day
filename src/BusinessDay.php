@@ -9,12 +9,26 @@ class BusinessDay extends Jenssenger
 {
     use Catholic;
 
-    private static $configFormat = "d-m";
-
-
-    public function isBusinessDay()
+    public function isBusinessDay(): bool
     {
-        return $this->dayOfWeek === config('business-day.restDay') | (config('business-day.saturdayIsBusinessDay') && $this->dayOfWeek == 6) | $this->isHoliday() ? false : true;
+        return !$this->isRestDay()
+            & !$this->isHoliday($this->getConfig(Configuration::HOLIDAYS))
+            & !$this->isSaturdayAndRestDay();
+    }
+
+    private function isRestDay(): bool
+    {
+        return $this->dayOfWeek === $this->getConfig(Configuration::REST_DAY);
+    }
+
+    private function isSaturdayAndRestDay()
+    {
+        return $this->isSaturday() ? !$this->isSaturdayBusinessDay() : false;
+    }
+
+    private function isSaturdayBusinessDay(): bool
+    {
+        return $this->getConfig(Configuration::SATURDAY_IS_BUSINESS_DAY);
     }
 
     public function nextBusinessDay()
@@ -31,21 +45,21 @@ class BusinessDay extends Jenssenger
     {
         $date = $this;
         do {
-            $date =  $date->subDay();
+            $date = $date->subDay();
         } while (!$date->isBusinessDay());
 
         return $date;
     }
 
-    private function isHoliday()
+    private function isHoliday(array $holidays)
     {
-        foreach (config('business-day.holidays') as $date) {
+        foreach ($holidays as $date) {
             if (is_array($date)) {
-                if ($this->inHolidayPeriod($date)) {
+                if ($this->onHolidayPeriod($date)) {
                     return true;
                 }
             } else {
-                if ($date."-".$this->year == $this->format("d-m-Y")) {
+                if ($this->onHoliday($date)) {
                     return true;
                 }
             }
@@ -53,15 +67,27 @@ class BusinessDay extends Jenssenger
         return false;
     }
 
-    private function inHolidayPeriod($dates)
+    private function onHoliday($date): bool
     {
-        $start = new static($dates[0]."-".$this->year);
-        $finish = new static($dates[1]."-".$this->year);
-        return $this->between($start->subDay(), $finish->addDay());
+        return $date . "-" . $this->year == $this->format("d-m-Y");
+    }
+
+    private function onHolidayPeriod($dates): bool
+    {
+        return $this->between(
+            (new static($dates[0] . "-" . $this->year))->subDay(),
+            (new static($dates[1] . "-" . $this->year))->addDay()
+        );
+    }
+
+    protected function getConfig($config)
+    {
+        $config = config('business-day.' . $config);
+        return $config;
     }
 
     public function config()
     {
-        return  $this->format(self::$configFormat);
+        return $this->format(Configuration::CONF_DATE_FORMAT);
     }
 }
