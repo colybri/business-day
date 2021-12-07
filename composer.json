@@ -3,7 +3,7 @@
   "description": "This library allows you to set a calendar of holidays in your Laravel application in a simple way.",
   "license": "MIT",
   "keywords": ["laravel", "time", "date", "datetime", "business day", "holidays"],
-  "version": "1.0.0",
+  "version": "2.0.0",
   "homepage": "https://www.colibriwebwork.com",
   "support": {
     "issues": "https://github.com/colybri/business-day/issues",
